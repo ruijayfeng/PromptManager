@@ -76,34 +76,49 @@
 
 ## 🚀 快速开始
 
-### 方式一：自动化脚本（推荐）
+### 方式一：Docker（推荐，跨平台）
 
 ```bash
 # 克隆项目
-git clone <repository-url>
+> SSH
+git clone git@github.com:ruijayfeng/PromptManager.git
+> HTTP
+git clone https://github.com/ruijayfeng/PromptManager.git
 cd PromptManager
 
+# 启动服务（所有平台通用）
+docker-compose up --build
+```
+
+### 方式二：自动化脚本
+
+#### Linux/macOS
+```bash
 # 运行开发环境设置脚本
 ./scripts/dev-setup.sh
 
-# 启动后端服务
+# 启动服务
 cd backend && source venv/bin/activate && uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
-
-# 启动前端服务
 cd frontend && npm run dev
 ```
 
-### 方式二：Docker容器（推荐用于快速体验）
+#### Windows
+```cmd
+# 运行开发环境设置脚本
+scripts\dev-setup.bat
+
+# 启动服务（一键启动）
+scripts\start-dev.bat
+```
+
+### 方式三：生产环境部署
 
 ```bash
-# 开发环境
-docker-compose up --build
-
 # 生产环境
 docker-compose -f docker-compose.prod.yml up -d
 ```
 
-### 方式三：手动安装
+### 方式四：手动安装
 
 #### 后端设置
 
