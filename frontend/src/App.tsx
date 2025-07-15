@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import { Layout } from './components/layout/Layout'
 import { PromptList } from './pages/PromptList'
 import { PromptDetail } from './pages/PromptDetail'
+import { PromptCreate } from './pages/PromptCreate'
 import { Login } from './pages/Login'
 import { Register } from './pages/Register'
 import { AuthGuard } from './components/auth/AuthGuard'
@@ -24,6 +25,7 @@ function App() {
             }>
               <Route index element={<Navigate to="/prompts" replace />} />
               <Route path="prompts" element={<PromptList />} />
+              <Route path="prompts/create" element={<PromptCreate />} />
               <Route path="prompts/:id" element={<PromptDetail />} />
             </Route>
             

@@ -1,10 +1,11 @@
 from fastapi import APIRouter, Depends, HTTPException, status, Query
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload
+from sqlalchemy import or_
 from typing import List, Optional
 
 from ..database import get_db
 from ..schemas.prompt import Prompt as PromptSchema, PromptCreate, PromptUpdate, PromptList
-from ..models.prompt import Prompt
+from ..models.prompt import Prompt, Tag
 from ..models.user import User
 from ..utils.auth import get_current_active_user
 
@@ -25,7 +26,11 @@ async def create_prompt(
     db.commit()
     db.refresh(db_prompt)
     
-    # TODO: Handle tag associations
+    # 处理标签关联
+    if prompt.tag_ids:
+        tags = db.query(Tag).filter(Tag.id.in_(prompt.tag_ids)).all()
+        db_prompt.tags = tags
+        db.commit()
     
     return db_prompt
 
@@ -36,11 +41,15 @@ async def list_prompts(
     category_id: Optional[int] = None,
     is_public: Optional[bool] = None,
     is_favorite: Optional[bool] = None,
+    search: Optional[str] = None,
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_active_user)
 ):
     """获取Prompt列表"""
-    query = db.query(Prompt).filter(Prompt.user_id == current_user.id)
+    query = db.query(Prompt).options(
+        joinedload(Prompt.category),
+        joinedload(Prompt.tags)
+    ).filter(Prompt.user_id == current_user.id)
     
     # 应用过滤器
     if category_id is not None:
@@ -49,6 +58,18 @@ async def list_prompts(
         query = query.filter(Prompt.is_public == is_public)
     if is_favorite is not None:
         query = query.filter(Prompt.is_favorite == is_favorite)
+    if search:
+        search_term = f"%{search}%"
+        query = query.filter(
+            or_(
+                Prompt.title.ilike(search_term),
+                Prompt.content.ilike(search_term),
+                Prompt.description.ilike(search_term)
+            )
+        )
+    
+    # 按创建时间倒序排列
+    query = query.order_by(Prompt.created_at.desc())
     
     # 计算总数
     total = query.count()
@@ -72,7 +93,10 @@ async def get_prompt(
     current_user: User = Depends(get_current_active_user)
 ):
     """获取单个Prompt"""
-    prompt = db.query(Prompt).filter(
+    prompt = db.query(Prompt).options(
+        joinedload(Prompt.category),
+        joinedload(Prompt.tags)
+    ).filter(
         Prompt.id == prompt_id,
         Prompt.user_id == current_user.id
     ).first()
@@ -113,10 +137,16 @@ async def update_prompt(
     for field, value in update_data.items():
         setattr(prompt, field, value)
     
+    # 处理标签更新
+    if prompt_update.tag_ids is not None:
+        if prompt_update.tag_ids:
+            tags = db.query(Tag).filter(Tag.id.in_(prompt_update.tag_ids)).all()
+            prompt.tags = tags
+        else:
+            prompt.tags = []
+    
     db.commit()
     db.refresh(prompt)
-    
-    # TODO: Handle tag updates
     
     return prompt
 
