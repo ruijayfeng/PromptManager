@@ -23,11 +23,10 @@ export class AuthService {
   // 用户登录
   static async login(credentials: LoginForm): Promise<AuthToken> {
     try {
-      const formData = new FormData()
-      formData.append('username', credentials.username)
-      formData.append('password', credentials.password)
-
-      const response = await apiService.post<AuthToken>('/api/auth/login', formData)
+      const response = await apiService.post<AuthToken>('/api/auth/login', {
+        username: credentials.username,
+        password: credentials.password
+      })
       return response
     } catch (error: any) {
       throw new Error(this.handleError(error))

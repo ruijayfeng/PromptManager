@@ -6,7 +6,10 @@
       "Bash(git add:*)",
       "Bash(git config:*)",
       "Bash(python:*)",
-      "Bash(npm run build:*)"
+      "Bash(npm run build:*)",
+      "Bash(git commit:*)",
+      "Bash(find:*)",
+      "Bash(chmod:*)"
     ],
     "deny": []
   }
