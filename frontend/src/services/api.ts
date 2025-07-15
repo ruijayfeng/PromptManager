@@ -91,3 +91,149 @@ class ApiService {
 }
 
 export const apiService = new ApiService()
+
+// Categories API
+export const categoriesApi = {
+  list: () => apiService.get('/api/categories'),
+  get: (id: number) => apiService.get(`/api/categories/${id}`),
+  create: (data: { name: string; description?: string; color?: string }) => 
+    apiService.post('/api/categories', data),
+  update: (id: number, data: { name?: string; description?: string; color?: string }) => 
+    apiService.put(`/api/categories/${id}`, data),
+  delete: (id: number) => apiService.delete(`/api/categories/${id}`)
+}
+
+// Tags API
+export const tagsApi = {
+  list: () => apiService.get('/api/tags'),
+  listMy: () => apiService.get('/api/tags/my'),
+  get: (id: number) => apiService.get(`/api/tags/${id}`),
+  create: (data: { name: string; color?: string }) => 
+    apiService.post('/api/tags', data),
+  update: (id: number, data: { name?: string; color?: string }) => 
+    apiService.put(`/api/tags/${id}`, data),
+  delete: (id: number) => apiService.delete(`/api/tags/${id}`)
+}
+
+// Prompts API  
+export const promptsApi = {
+  list: (params?: {
+    page?: number
+    per_page?: number
+    category_id?: number
+    is_public?: boolean
+    is_favorite?: boolean
+    search?: string
+  }) => {
+    return apiService.get('/api/prompts', params)
+  },
+  
+  listPublic: (params?: {
+    page?: number
+    per_page?: number
+    category_id?: number
+    search?: string
+  }) => {
+    return apiService.get('/api/prompts/public', params)
+  },
+  
+  get: (id: number) => apiService.get(`/api/prompts/${id}`),
+  
+  create: (data: {
+    title: string
+    content: string
+    description?: string
+    category_id?: number
+    tag_ids?: number[]
+    is_public?: boolean
+    is_favorite?: boolean
+  }) => apiService.post('/api/prompts', data),
+  
+  update: (id: number, data: {
+    title?: string
+    content?: string
+    description?: string
+    category_id?: number | null
+    tag_ids?: number[]
+    is_public?: boolean
+    is_favorite?: boolean
+  }) => apiService.put(`/api/prompts/${id}`, data),
+  
+  delete: (id: number) => apiService.delete(`/api/prompts/${id}`),
+  
+  toggleFavorite: (id: number) => apiService.post(`/api/prompts/${id}/favorite`),
+  
+  togglePublic: (id: number) => apiService.post(`/api/prompts/${id}/public`)
+}
+
+// Search API
+export const searchApi = {
+  searchPrompts: (query: string, filters?: {
+    categoryId?: number | null
+    tagIds?: number[]
+    isPublic?: boolean
+    isFavorite?: boolean
+    page?: number
+    perPage?: number
+  }) => {
+    const params: any = { search: query }
+    
+    if (filters?.categoryId !== undefined && filters.categoryId !== null) {
+      params.category_id = filters.categoryId
+    }
+    if (filters?.tagIds?.length) {
+      params.tag_ids = filters.tagIds
+    }
+    if (filters?.isPublic !== undefined) {
+      params.is_public = filters.isPublic
+    }
+    if (filters?.isFavorite !== undefined) {
+      params.is_favorite = filters.isFavorite
+    }
+    if (filters?.page !== undefined) {
+      params.page = filters.page
+    }
+    if (filters?.perPage !== undefined) {
+      params.per_page = filters.perPage
+    }
+    
+    return apiService.get('/api/prompts', params)
+  }
+}
+
+// Export/Import API
+export const exportApi = {
+  exportPrompts: async (format: 'json' | 'markdown', promptIds?: number[]) => {
+    const params: any = { format }
+    if (promptIds?.length) {
+      params.prompt_ids = promptIds
+    }
+    
+    const response = await apiService.client.get('/api/export/prompts', {
+      params,
+      responseType: 'blob'
+    })
+    
+    // 创建下载链接
+    const url = window.URL.createObjectURL(new Blob([response.data]))
+    const link = document.createElement('a')
+    link.href = url
+    link.setAttribute('download', `prompts_export.${format === 'json' ? 'json' : 'md'}`)
+    document.body.appendChild(link)
+    link.click()
+    link.remove()
+    window.URL.revokeObjectURL(url)
+  },
+  
+  importPrompts: async (file: File, format: 'json' | 'markdown') => {
+    const formData = new FormData()
+    formData.append('file', file)
+    formData.append('format', format)
+    
+    return apiService.client.post('/api/export/import', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      }
+    })
+  }
+}

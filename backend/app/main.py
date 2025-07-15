@@ -5,7 +5,7 @@ from fastapi.staticfiles import StaticFiles
 from dotenv import load_dotenv
 
 from .database import engine, Base
-from .routers import auth, prompts, categories, search, export
+from .routers import auth, prompts, categories, tags, search, export, analytics
 
 # Load environment variables
 load_dotenv()
@@ -36,8 +36,10 @@ app.add_middleware(
 app.include_router(auth.router, prefix="/api/auth", tags=["认证"])
 app.include_router(prompts.router, prefix="/api/prompts", tags=["提示词"])
 app.include_router(categories.router, prefix="/api/categories", tags=["分类"])
+app.include_router(tags.router, prefix="/api/tags", tags=["标签"])
 app.include_router(search.router, prefix="/api/search", tags=["搜索"])
 app.include_router(export.router, prefix="/api/export", tags=["导入导出"])
+app.include_router(analytics.router, prefix="/api/analytics", tags=["统计分析"])
 
 @app.get("/")
 async def root():

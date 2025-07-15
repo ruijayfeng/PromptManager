@@ -42,14 +42,14 @@ async def list_prompts(
     is_public: Optional[bool] = None,
     is_favorite: Optional[bool] = None,
     search: Optional[str] = None,
+    sort_by: str = Query("created_at", regex="^(created_at|updated_at|view_count|title)$"),
+    sort_order: str = Query("desc", regex="^(asc|desc)$"),
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_active_user)
 ):
     """获取Prompt列表"""
-    query = db.query(Prompt).options(
-        joinedload(Prompt.category),
-        joinedload(Prompt.tags)
-    ).filter(Prompt.user_id == current_user.id)
+    # 使用更高效的查询策略
+    query = db.query(Prompt).filter(Prompt.user_id == current_user.id)
     
     # 应用过滤器
     if category_id is not None:
@@ -68,15 +68,22 @@ async def list_prompts(
             )
         )
     
-    # 按创建时间倒序排列
-    query = query.order_by(Prompt.created_at.desc())
+    # 动态排序
+    sort_column = getattr(Prompt, sort_by)
+    if sort_order == "desc":
+        query = query.order_by(sort_column.desc())
+    else:
+        query = query.order_by(sort_column.asc())
     
-    # 计算总数
+    # 计算总数（在分页之前）
     total = query.count()
     
-    # 分页
+    # 分页并预加载关联数据
     offset = (page - 1) * per_page
-    prompts = query.offset(offset).limit(per_page).all()
+    prompts = query.offset(offset).limit(per_page).options(
+        joinedload(Prompt.category),
+        joinedload(Prompt.tags)
+    ).all()
     
     return PromptList(
         prompts=prompts,
@@ -149,6 +156,111 @@ async def update_prompt(
     db.refresh(prompt)
     
     return prompt
+
+@router.post("/{prompt_id}/favorite")
+async def toggle_favorite(
+    prompt_id: int,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_active_user)
+):
+    """切换收藏状态"""
+    prompt = db.query(Prompt).filter(
+        Prompt.id == prompt_id,
+        Prompt.user_id == current_user.id
+    ).first()
+    
+    if not prompt:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Prompt不存在"
+        )
+    
+    prompt.is_favorite = not prompt.is_favorite
+    db.commit()
+    
+    return {
+        "message": "收藏状态已更新",
+        "is_favorite": prompt.is_favorite
+    }
+
+@router.post("/{prompt_id}/public")
+async def toggle_public(
+    prompt_id: int,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_active_user)
+):
+    """切换公开状态"""
+    prompt = db.query(Prompt).filter(
+        Prompt.id == prompt_id,
+        Prompt.user_id == current_user.id
+    ).first()
+    
+    if not prompt:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Prompt不存在"
+        )
+    
+    prompt.is_public = not prompt.is_public
+    db.commit()
+    
+    return {
+        "message": "公开状态已更新",
+        "is_public": prompt.is_public
+    }
+
+@router.get("/public", response_model=PromptList)
+async def list_public_prompts(
+    page: int = Query(1, ge=1),
+    per_page: int = Query(20, ge=1, le=100),
+    category_id: Optional[int] = None,
+    search: Optional[str] = None,
+    sort_by: str = Query("view_count", regex="^(created_at|updated_at|view_count|title)$"),
+    sort_order: str = Query("desc", regex="^(asc|desc)$"),
+    db: Session = Depends(get_db)
+):
+    """获取公开的Prompt列表"""
+    # 使用索引优化的查询
+    query = db.query(Prompt).filter(Prompt.is_public == True)
+    
+    # 应用过滤器
+    if category_id is not None:
+        query = query.filter(Prompt.category_id == category_id)
+    if search:
+        search_term = f"%{search}%"
+        query = query.filter(
+            or_(
+                Prompt.title.ilike(search_term),
+                Prompt.content.ilike(search_term),
+                Prompt.description.ilike(search_term)
+            )
+        )
+    
+    # 动态排序
+    sort_column = getattr(Prompt, sort_by)
+    if sort_order == "desc":
+        query = query.order_by(sort_column.desc())
+    else:
+        query = query.order_by(sort_column.asc())
+    
+    # 计算总数
+    total = query.count()
+    
+    # 分页并预加载关联数据
+    offset = (page - 1) * per_page
+    prompts = query.offset(offset).limit(per_page).options(
+        joinedload(Prompt.category),
+        joinedload(Prompt.tags),
+        joinedload(Prompt.owner)
+    ).all()
+    
+    return PromptList(
+        prompts=prompts,
+        total=total,
+        page=page,
+        per_page=per_page,
+        total_pages=(total + per_page - 1) // per_page
+    )
 
 @router.delete("/{prompt_id}")
 async def delete_prompt(
