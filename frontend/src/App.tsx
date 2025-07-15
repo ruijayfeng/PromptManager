@@ -5,29 +5,32 @@ import { PromptList } from './pages/PromptList'
 import { PromptDetail } from './pages/PromptDetail'
 import { Login } from './pages/Login'
 import { Register } from './pages/Register'
-import { useAuthStore } from './stores/auth'
+import { AuthGuard } from './components/auth/AuthGuard'
+import { ProtectedRoute } from './components/auth/ProtectedRoute'
 
 function App() {
-  const { isAuthenticated } = useAuthStore()
-
   return (
     <Router>
-      <div className="min-h-screen bg-primary-50 dark:bg-primary-950">
-        <Routes>
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
-          
-          {isAuthenticated ? (
-            <Route path="/" element={<Layout />}>
+      <AuthGuard>
+        <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+          <Routes>
+            <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} />
+            
+            <Route path="/" element={
+              <ProtectedRoute>
+                <Layout />
+              </ProtectedRoute>
+            }>
               <Route index element={<Navigate to="/prompts" replace />} />
               <Route path="prompts" element={<PromptList />} />
               <Route path="prompts/:id" element={<PromptDetail />} />
             </Route>
-          ) : (
+            
             <Route path="*" element={<Navigate to="/login" replace />} />
-          )}
-        </Routes>
-      </div>
+          </Routes>
+        </div>
+      </AuthGuard>
     </Router>
   )
 }

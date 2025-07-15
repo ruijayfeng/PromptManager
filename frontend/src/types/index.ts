@@ -48,11 +48,32 @@ export interface PromptList {
   total_pages: number
 }
 
+// 认证相关类型
+export interface AuthToken {
+  access_token: string
+  token_type: string
+}
+
+export interface AuthUser {
+  id: number
+  username: string
+  email: string
+  is_active: boolean
+  created_at: string
+  updated_at: string
+}
+
 // API 响应类型
 export interface ApiResponse<T> {
-  data: T
+  data?: T
   message?: string
   success: boolean
+  detail?: string
+}
+
+export interface ApiError {
+  detail: string | { [key: string]: string[] }
+  status_code?: number
 }
 
 // 表单类型
