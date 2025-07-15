@@ -8,6 +8,7 @@ import { Button } from '../ui/Button'
 import { Input } from '../ui/Input'
 import { Textarea } from '../ui/Textarea'
 import { Alert } from '../ui/Alert'
+import { MarkdownEditor } from '../markdown/MarkdownEditor'
 
 interface PromptFormProps {
   initialData?: Partial<PromptFormType>
@@ -171,17 +172,18 @@ export const PromptForm: React.FC<PromptFormProps> = ({
           />
 
           {/* Content */}
-          <Textarea
-            label="提示词内容"
-            value={values.content}
-            onChange={(e) => handleChange('content', e.target.value)}
-            onBlur={() => handleBlur('content')}
-            error={errors.content}
-            placeholder="请输入提示词内容..."
-            rows={10}
-            className="font-mono"
-            required
-          />
+          <div>
+            <MarkdownEditor
+              label="提示词内容"
+              value={values.content}
+              onChange={(value) => handleChange('content', value)}
+              error={errors.content}
+              placeholder="请输入提示词内容..."
+              height="500px"
+              showToolbar={true}
+              showPreview={true}
+            />
+          </div>
 
           {/* Category */}
           <div>

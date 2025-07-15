@@ -96,9 +96,12 @@ export const PromptCard: React.FC<PromptCardProps> = ({
 
         <div className="mb-4">
           <div className="bg-gray-50 dark:bg-gray-900 rounded-md p-3">
-            <p className="text-sm text-gray-700 dark:text-gray-300 line-clamp-3 font-mono">
-              {truncateText(prompt.content, 150)}
-            </p>
+            <div className="text-sm text-gray-700 dark:text-gray-300 line-clamp-3 prose prose-sm prose-gray dark:prose-invert max-w-none">
+              {/* 简化的Markdown预览，只显示纯文本 */}
+              <p className="font-mono">
+                {truncateText(prompt.content.replace(/[#*`_~[\]()]/g, ''), 150)}
+              </p>
+            </div>
           </div>
         </div>
 

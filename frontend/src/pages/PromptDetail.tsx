@@ -16,6 +16,7 @@ import {
 import { usePromptStore } from '../stores/prompt'
 import { Button } from '../components/ui/Button'
 import { Alert } from '../components/ui/Alert'
+import { MarkdownRenderer } from '../components/markdown/MarkdownRenderer'
 
 export function PromptDetail() {
   const { id } = useParams<{ id: string }>()
@@ -292,9 +293,7 @@ export function PromptDetail() {
             提示词内容
           </h3>
           <div className="bg-gray-50 dark:bg-gray-900 rounded-lg p-4 border">
-            <pre className="whitespace-pre-wrap text-sm text-gray-800 dark:text-gray-200 font-mono leading-relaxed">
-              {currentPrompt.content}
-            </pre>
+            <MarkdownRenderer content={currentPrompt.content} />
           </div>
         </div>
       </div>

@@ -1,0 +1,118 @@
+/* Custom markdown styles */
+
+/* Code block styling */
+.hljs {
+  background: #f6f8fa !important;
+  color: #24292e !important;
+}
+
+.dark .hljs {
+  background: #0d1117 !important;
+  color: #c9d1d9 !important;
+}
+
+/* KaTeX math styling */
+.katex {
+  font-size: 1em !important;
+}
+
+.katex-display {
+  margin: 1em 0 !important;
+}
+
+/* Task list styling */
+.prose input[type="checkbox"] {
+  margin-right: 0.5rem;
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+/* Table overflow handling */
+.prose table {
+  display: block;
+  overflow-x: auto;
+  white-space: nowrap;
+}
+
+.prose table tbody tr {
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.dark .prose table tbody tr {
+  border-bottom: 1px solid #374151;
+}
+
+/* Blockquote styling */
+.prose blockquote {
+  font-style: normal;
+  font-weight: normal;
+  border-left-width: 4px;
+  margin: 1.5em 0;
+  padding: 0.5em 1em;
+}
+
+/* Code styling */
+.prose code::before,
+.prose code::after {
+  content: none !important;
+}
+
+.prose pre code {
+  background-color: transparent !important;
+  border: none !important;
+  padding: 0 !important;
+  border-radius: 0 !important;
+  font-weight: inherit !important;
+  color: inherit !important;
+  font-size: inherit !important;
+}
+
+/* Link styling */
+.prose a {
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.prose a:hover {
+  text-decoration: underline;
+}
+
+/* Heading anchor styling */
+.prose h1, 
+.prose h2, 
+.prose h3, 
+.prose h4, 
+.prose h5, 
+.prose h6 {
+  scroll-margin-top: 2rem;
+}
+
+/* Lists */
+.prose ul, 
+.prose ol {
+  padding-left: 1.5rem;
+}
+
+.prose li {
+  margin: 0.25rem 0;
+}
+
+/* Image styling */
+.prose img {
+  max-width: 100%;
+  height: auto;
+  margin: 1rem auto;
+  display: block;
+}
+
+/* Horizontal rule */
+.prose hr {
+  margin: 2rem 0;
+  border: none;
+  height: 1px;
+  background: linear-gradient(to right, transparent, #d1d5db, transparent);
+}
+
+.dark .prose hr {
+  background: linear-gradient(to right, transparent, #4b5563, transparent);
+}

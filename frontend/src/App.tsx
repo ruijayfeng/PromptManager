@@ -4,6 +4,7 @@ import { Layout } from './components/layout/Layout'
 import { PromptList } from './pages/PromptList'
 import { PromptDetail } from './pages/PromptDetail'
 import { PromptCreate } from './pages/PromptCreate'
+import { PromptEdit } from './pages/PromptEdit'
 import { Login } from './pages/Login'
 import { Register } from './pages/Register'
 import { AuthGuard } from './components/auth/AuthGuard'
@@ -27,6 +28,7 @@ function App() {
               <Route path="prompts" element={<PromptList />} />
               <Route path="prompts/create" element={<PromptCreate />} />
               <Route path="prompts/:id" element={<PromptDetail />} />
+              <Route path="prompts/:id/edit" element={<PromptEdit />} />
             </Route>
             
             <Route path="*" element={<Navigate to="/login" replace />} />
