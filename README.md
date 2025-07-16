@@ -82,27 +82,27 @@
 
 ```bash
 # 1. 克隆项目
-git clone <repository-url>
+git clone https://github.com/ruijayfeng/PromptManager.git
 cd PromptManager
 
-# 2. 后端启动（端口8001）
+# 2. 后端启动（端口8003）
 cd backend
 
 # 安装简化版依赖（避免Rust编译问题）
-pip install fastapi==0.104.1 uvicorn==0.24.0 sqlalchemy==1.4.50 python-jose==3.3.0 passlib==1.7.4 python-multipart==0.0.6 python-dotenv==1.0.0 email-validator
+pip install fastapi==0.104.1 uvicorn==0.24.0 sqlalchemy==1.4.50 python-jose==3.3.0 passlib==1.7.4 python-multipart==0.0.6 python-dotenv==1.0.0 email-validator bcrypt
 
 # 启动后端服务
 python -c "
 import uvicorn
 from app.main import app
-uvicorn.run(app, host='0.0.0.0', port=8001)
+uvicorn.run(app, host='0.0.0.0', port=8003)
 "
 
 # 3. 前端启动（新终端窗口）
 cd frontend
 
 # 配置API连接地址
-echo VITE_API_URL=http://localhost:8001 > .env
+echo VITE_API_URL=http://localhost:8003 > .env
 
 # 安装依赖
 npm install
@@ -113,20 +113,49 @@ npm run dev -- --port 5173
 
 **访问地址：**
 - 🌐 前端界面：http://localhost:5173
-- 🔧 后端API：http://localhost:8001
-- 📚 API文档：http://localhost:8001/api/docs
+- 🔧 后端API：http://localhost:8003
+- 📚 API文档：http://localhost:8003/api/docs
 
-### 方式二：Docker容器（推荐用于快速体验）
+### 方式二：Docker（推荐，跨平台）
 
 ```bash
-# 开发环境
-docker-compose up --build
+# 克隆项目
+git clone https://github.com/ruijayfeng/PromptManager.git
+cd PromptManager
 
+# 启动服务（所有平台通用）
+docker-compose up --build
+```
+
+### 方式三：自动化脚本
+
+#### Linux/macOS
+```bash
+# 运行开发环境设置脚本
+./scripts/dev-setup.sh
+
+# 启动服务
+cd backend && source venv/bin/activate && uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+cd frontend && npm run dev
+```
+
+#### Windows
+```cmd
+# 运行开发环境设置脚本
+scripts\dev-setup.bat
+
+# 启动服务（一键启动）
+scripts\start-dev.bat
+```
+
+### 方式四：生产环境部署
+
+```bash
 # 生产环境
 docker-compose -f docker-compose.prod.yml up -d
 ```
 
-### 方式三：手动安装
+### 方式四：手动安装
 
 #### 后端设置
 
