@@ -9,7 +9,10 @@
       "Bash(npm run build:*)",
       "Bash(git commit:*)",
       "Bash(find:*)",
-      "Bash(chmod:*)"
+      "Bash(chmod:*)",
+      "Bash(npm run dev:*)",
+      "Bash(pip install:*)",
+      "Bash(curl:*)"
     ],
     "deny": []
   }

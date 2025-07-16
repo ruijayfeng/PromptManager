@@ -329,7 +329,7 @@ export const MarkdownEditor: React.FC<MarkdownEditorProps> = ({
               <h4 className="font-medium text-blue-900 dark:text-blue-100 mb-2">其他</h4>
               <div className="space-y-1 text-blue-700 dark:text-blue-300">
                 <div># 标题</div>
-                <div>> 引用</div>
+                <div>{'>'} 引用</div>
                 <div>```代码块```</div>
                 <div>$数学公式$</div>
               </div>

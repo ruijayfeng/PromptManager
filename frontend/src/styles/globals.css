@@ -49,7 +49,7 @@
   }
 
   .prose {
-    @apply prose-primary dark:prose-invert prose-headings:font-semibold prose-a:text-accent-600 prose-strong:text-primary-900 dark:prose-strong:text-primary-100;
+    @apply dark:prose-invert prose-headings:font-semibold prose-a:text-accent-600 prose-strong:text-primary-900 dark:prose-strong:text-primary-100;
   }
 }
 
