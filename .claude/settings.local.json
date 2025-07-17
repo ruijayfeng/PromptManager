@@ -15,7 +15,11 @@
       "Bash(curl:*)",
       "Bash(git push:*)",
       "Bash(git fetch:*)",
-      "Bash(git pull:*)"
+      "Bash(git pull:*)",
+      "Bash(scriptsstart-dev.bat)",
+      "Bash(./venv/Scripts/activate)",
+      "Bash(npm install:*)",
+      "Bash(start \"Frontend Server\" npm run dev)"
     ],
     "deny": []
   }
