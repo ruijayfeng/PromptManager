@@ -27,9 +27,17 @@ class ApiService {
     // 请求拦截器 - 添加认证头
     this.client.interceptors.request.use(
       (config) => {
-        const { token } = useAuthStore.getState()
-        if (token) {
-          config.headers.Authorization = `Bearer ${token}`
+        // 不需要认证的端点
+        const publicEndpoints = ['/api/auth/register', '/api/auth/login', '/api/health']
+        const isPublicEndpoint = publicEndpoints.some(endpoint => 
+          config.url?.includes(endpoint)
+        )
+        
+        if (!isPublicEndpoint) {
+          const { token } = useAuthStore.getState()
+          if (token) {
+            config.headers.Authorization = `Bearer ${token}`
+          }
         }
         return config
       },
