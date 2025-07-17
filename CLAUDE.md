@@ -41,28 +41,52 @@ prompt-manager/
 
 ## Development Commands
 
-### Backend (FastAPI)
+### 🚀 **推荐启动方式（已验证可完全使用）**
+
+**重要提示**：请按照以下顺序启动，确保前后端正常通信和用户认证功能：
+
+#### Step 1: 启动后端服务
+```bash
+cd backend && python start.py
+```
+- 后端运行在：http://localhost:8001
+- API文档：http://localhost:8001/api/docs
+- 健康检查：http://localhost:8001/api/health
+
+#### Step 2: 启动前端服务
+```bash
+cd frontend && npm run dev
+```
+- 前端自动分配端口（通常是 5173, 5174, 5175... 等）
+- 通过Vite代理访问后端API
+- 支持热重载开发
+
+#### Step 3: 验证功能
+访问前端地址（如 http://localhost:5178），验证：
+- ✅ 用户注册功能正常
+- ✅ 用户登录功能正常  
+- ✅ 可以进入主页面 `/prompts`
+- ✅ 所有API通信正常
+
+### 传统启动方式（备用）
+
+#### Backend (FastAPI)
 ```bash
 # Install dependencies
 cd backend && pip install -r requirements.txt
 
-# Run development server
-cd backend && uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+# Run development server (alternative)
+cd backend && uvicorn app.main:app --reload --host 0.0.0.0 --port 8001
 
 # Database migration (when using Alembic)
 cd backend && alembic revision --autogenerate -m "description"
 cd backend && alembic upgrade head
-
-# API documentation available at http://localhost:8000/docs
 ```
 
-### Frontend (React)
+#### Frontend (React)
 ```bash
 # Install dependencies
 cd frontend && npm install
-
-# Run development server
-cd frontend && npm run dev
 
 # Build for production
 cd frontend && npm run build
@@ -113,6 +137,36 @@ Key Markdown packages:
 - **Categories**: id, name, description, user_id, created_at
 - **Tags**: id, name, created_at
 - **PromptTags**: Many-to-many relationship table
+
+## 🔧 **重要技术要点和问题解决记录**
+
+### 已解决的关键问题
+1. **Network Error问题**：
+   - 问题：前端直接访问API URL导致跨域问题
+   - 解决：使用Vite代理，前端通过相对路径访问API
+   - 配置：注释掉`.env`中的`VITE_API_URL`，使用空baseURL
+
+2. **Not authenticated问题**：
+   - 问题：axios拦截器给所有请求添加认证头
+   - 解决：区分公共端点，只对需要认证的端点添加Authorization头
+   - 配置：`['/api/auth/register', '/api/auth/login', '/api/health']`为公共端点
+
+3. **登录后认证失败**：
+   - 问题：前端状态管理时序问题，token未及时设置
+   - 解决：在获取用户信息前先设置token到状态中
+   - 关键：确保axios拦截器能获取到token
+
+### 端口配置
+- **后端固定端口**：8001
+- **前端动态端口**：5173, 5174, 5175...（自动分配）
+- **CORS配置**：支持所有常用端口
+- **代理配置**：前端通过Vite代理访问后端
+
+### 认证机制
+- **JWT认证**：30分钟有效期
+- **密码加密**：bcrypt哈希算法
+- **状态管理**：Zustand持久化存储
+- **路由守护**：自动重定向到登录页
 
 ## Development Workflow
 
