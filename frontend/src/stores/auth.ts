@@ -33,6 +33,14 @@ export const useAuthStore = create<AuthState>()(
           set({ isLoading: true, error: null })
           
           const tokenData: AuthToken = await authService.login(credentials)
+          
+          // 先设置token，确保axios拦截器能获取到token
+          set({
+            token: tokenData.access_token,
+            isAuthenticated: true,
+          })
+          
+          // 然后获取用户信息
           const userData: AuthUser = await authService.getCurrentUser()
           
           set({
