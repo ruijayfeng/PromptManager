@@ -19,7 +19,8 @@
       "Bash(scriptsstart-dev.bat)",
       "Bash(./venv/Scripts/activate)",
       "Bash(npm install:*)",
-      "Bash(start \"Frontend Server\" npm run dev)"
+      "Bash(start \"Frontend Server\" npm run dev)",
+      "Bash(taskkill:*)"
     ],
     "deny": []
   }

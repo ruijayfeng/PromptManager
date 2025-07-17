@@ -5,7 +5,17 @@ import { AuthToken, AuthUser, LoginForm, RegisterForm } from '../types'
 export class AuthService {
   // 处理API错误的辅助方法
   private static handleError(error: any): string {
+    console.log('Auth Error:', error)
+    
     if (error instanceof AxiosError) {
+      if (error.code === 'ECONNREFUSED' || error.code === 'ERR_NETWORK') {
+        return '无法连接到服务器，请检查网络连接'
+      }
+      
+      if (error.code === 'ECONNABORTED') {
+        return '请求超时，请稍后重试'
+      }
+      
       if (error.response?.data) {
         const errorData = error.response.data as any
         if (typeof errorData.detail === 'string') {

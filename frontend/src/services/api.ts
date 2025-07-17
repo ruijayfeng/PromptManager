@@ -12,7 +12,7 @@ class ApiService {
       headers: {
         'Content-Type': 'application/json',
       },
-      timeout: 10000,
+      timeout: 30000,
     })
 
     this.setupInterceptors()
@@ -76,6 +76,16 @@ class ApiService {
 
   // 处理API错误
   static handleApiError(error: AxiosError): string {
+    console.log('API Error:', error)
+    
+    if (error.code === 'ECONNREFUSED' || error.code === 'ERR_NETWORK') {
+      return '无法连接到服务器，请检查网络连接或稍后重试'
+    }
+    
+    if (error.code === 'ECONNABORTED') {
+      return '请求超时，请稍后重试'
+    }
+    
     if (error.response?.data) {
       const errorData = error.response.data as any
       if (typeof errorData.detail === 'string') {
@@ -86,6 +96,7 @@ class ApiService {
         return firstError[0] || '请求失败'
       }
     }
+    
     return error.message || '网络错误，请稍后重试'
   }
 }
