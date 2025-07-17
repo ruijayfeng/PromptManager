@@ -1,7 +1,12 @@
 import axios, { AxiosInstance, AxiosError } from 'axios'
 import { useAuthStore } from '../stores/auth'
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8001'
+// 在开发环境中使用相对路径，通过Vite代理访问API
+// 在生产环境中使用完整URL
+const API_BASE_URL = import.meta.env.VITE_API_URL || (import.meta.env.DEV ? '' : 'http://localhost:8001')
+console.log('API_BASE_URL:', API_BASE_URL)
+console.log('VITE_API_URL env:', import.meta.env.VITE_API_URL)
+console.log('DEV mode:', import.meta.env.DEV)
 
 class ApiService {
   private client: AxiosInstance
